@@ -1,47 +1,57 @@
-
-import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import compression from 'compression';
+import cookieParser from 'cookie-parser';
+
 import connectDB from './config/db.js';
 import { PORT } from './config/utils.js';
+
 import authRouter from './routes/auth.js';
 import postsRouter from './routes/posts.js';
+
 import { connectToRedis } from './services/redis.js';
+
 const app = express();
-app.get("/api/test", (req, res) => {
-  res.json({
-    message: "Backend connected successfully"
-  });
-});
-const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
 app.use(cookieParser());
 app.use(compression());
+
+// Test API
+app.get('/api/test', (req, res) => {
+  res.json({
+    message: 'Backend connected successfully',
+  });
+});
 
 // Connect to database
 connectDB();
 
-// Connect to redis
+// Connect to Redis
 connectToRedis();
 
-// API route
+// API routes
 app.use('/api/posts', postsRouter);
 app.use('/api/auth', authRouter);
 
+// Home route
 app.get('/', (req, res) => {
-  res.send('Yay!! Backend of wanderlust app is now accessible');
+  res.json({
+    message: 'Wanderlust Backend is running',
+  });
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-export default app;
