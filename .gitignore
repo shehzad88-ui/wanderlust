@@ -4,4 +4,7 @@ backend/.env
 backend/node_modules
 /node_modules
 coverage/
-.idea/
+.idea/node_modules/
+.env
+.env.*
+!.env.example
